@@ -29,7 +29,7 @@ Yolov5(W)yolov5s-face.pt		:		1006/1830,Time     13.463255643844604,	0.013356 sec
 
 
 
-檢測方式：python test_all_carmar
+檢測方式：python test_all_camera.py
 
 影像檔抓到的次數(張數)
 
