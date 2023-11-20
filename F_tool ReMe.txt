@@ -1,0 +1,6 @@
+cat F_tool/* > Facelandmark_tool.zip
+將資料整合後解壓縮在windows下
+WindowsFormsApp1為原始程式 使用 Microsoft Visual C#2019 可執行編譯和修改
+Release/Facelandmark_tool.exe 可直接執行
+bigData 內為需要用到的較大檔案及weight檔
+
