@@ -377,7 +377,7 @@ def main(args):
 	R_all=0
 	conf=0.0
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-	model = load_model("weights/yolov5s-face.pt", device)
+	model = load_model("weights/yolov5n-face.pt", device)
 	out_txt = 'labels/label.txt'
 	# 檢查目錄是否存在，如果不存在，創建它
 	output_directory = os.path.dirname(out_txt)
