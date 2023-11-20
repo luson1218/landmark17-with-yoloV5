@@ -4,7 +4,7 @@ facelandmark with yolov5
 
 引言.
 
-將眼睛特徵與yoloV5結合
+將眼睛特徵（共17點）與yoloV5結合
 
 表現.
 
