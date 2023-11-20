@@ -53,6 +53,8 @@ python create_labels.py
 
 使用資料集ibug_300W_large_face_landmark_dataset/labels_ibug_300W_test.xml
 
+https://www.kaggle.com/datasets/toxicloser/ibug-300w-large-face-landmark-dataset
+
 使用yolo5 face 取face 與 5個特徵點 加上Dlib取12個特徵點(眼睛)
 
 產生labels 資料夾 （label.txt 與images）
