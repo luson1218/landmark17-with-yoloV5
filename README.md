@@ -9,7 +9,11 @@ facelandmark with yolov5
 表現.
 
 檢測方式：
-python test_all_pic.py     shape_predictor_68_face_landmarks.dat 下載處 http://dlib.net/files/
+python test_all_pic.py     
+
+shape_predictor_68_face_landmarks.dat 下載處 http://dlib.net/files/
+
+face_landmarks34_230715.pth  可照此網站方式產生 CNN: https://arkalim.org/blog/face-landmarks-detection/
 
 抓到的目標物 / 抓到的人臉數
 
