@@ -80,6 +80,7 @@ cd data
 將之前處理好的labels資料夾放置 data 內
 
 python3 train2yolo.py /labels /save/labels/train
+
 python3 val2yolo.py  /retinaface_gt_v1.1 /save/labels/val
 
 進行訓練
