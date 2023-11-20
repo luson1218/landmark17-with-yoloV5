@@ -70,6 +70,8 @@ https://www.kaggle.com/datasets/toxicloser/ibug-300w-large-face-landmark-dataset
 Facelandmark_tool        #針對上面產生的資料做細部處理
 一些太複雜或不完整的圖也不取用（直接刪除）
 
+請參考F_tool ReMe.txt
+
 Data preparation
 
 此部份的操作可參考https://github.com/deepcam-cn/yolov5-face
