@@ -70,11 +70,9 @@ https://www.kaggle.com/datasets/toxicloser/ibug-300w-large-face-landmark-dataset
 Facelandmark_tool        #針對上面產生的資料做細部處理
 一些太複雜或不完整的圖也不取用（直接刪除）
 
-python3 train2yolo.py /labels /save/labels/train   ＃將資料轉成yolo訓練格式（Normalization）
+Data preparation
 
 此部份的操作可參考https://github.com/deepcam-cn/yolov5-face
-
-Data preparation
 
 Download annotation files from 
 https://drive.google.com/file/d/1tU_IjyOwGQfGNUvZGwWWM4SwxKp2PUQ8/view?usp=sharing
@@ -83,7 +81,7 @@ https://drive.google.com/file/d/1tU_IjyOwGQfGNUvZGwWWM4SwxKp2PUQ8/view?usp=shari
 cd data
 將之前處理好的labels資料夾放置 data 內
 
-python3 train2yolo.py /labels /save/labels/train
+python3 train2yolo.py /labels /save/labels/train  ＃將資料轉成yolo訓練格式（Normalization）
 
 python3 val2yolo.py  /retinaface_gt_v1.1 /save/labels/val
 
