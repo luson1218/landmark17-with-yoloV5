@@ -70,6 +70,18 @@ python3 train2yolo.py /labels /save/labels/train   ＃將資料轉成yolo訓練�
 
 此部份的操作可參考https://github.com/deepcam-cn/yolov5-face
 
+Data preparation
+
+Download annotation files from 
+https://drive.google.com/file/d/1tU_IjyOwGQfGNUvZGwWWM4SwxKp2PUQ8/view?usp=sharing
+只需下載val資料即可
+
+cd data
+將之前處理好的labels資料夾放置 data 內
+
+python3 train2yolo.py /labels /save/labels/train
+python3 val2yolo.py  /retinaface_gt_v1.1 /save/labels/val
+
 進行訓練
 CUDA_VISIBLE_DEVICES="0" python3 train.py --data data/luson_test.yaml --cfg models/yolov5s.yaml --weights weights/yolov5s.pt --epochs 250 --img-size 480
 
