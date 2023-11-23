@@ -138,7 +138,7 @@ def get_euler_angle(rotation_vector):
     #print(rotation_vector)
     #'''
     rotation_matrix, _ = cv2.Rodrigues(rotation_vector)
-    print("rotation_matrix:\n",rotation_matrix)
+    #print("rotation_matrix:\n",rotation_matrix)
     m21=rotation_matrix[2, 1]
     m01=rotation_matrix[0, 1]
     m11=rotation_matrix[1, 1]
@@ -151,7 +151,7 @@ def get_euler_angle(rotation_vector):
     z = (rotation_matrix[1, 0] - rotation_matrix[0, 1]) / (4 * w)
     # 创建四元数
     quaternion = np.array([w, x, y, z])
-    print("Quaternion:", quaternion)
+    #print("Quaternion:", quaternion)
     #'''
     
     '''
@@ -207,14 +207,14 @@ def get_euler_angle(rotation_vector):
     #roll = np.arctan2(m20, m22)
     #print('pitch:{}, yaw:{}, roll:{}'.format(pitch, yaw, roll))
     #print("t0,t2,t5,t3,t4:",t0,t2,t5,t3,t4)
-    print("pitch,yaw,roll,math.pi:",pitch,yaw,roll,math.pi)
+    #print("pitch,yaw,roll,math.pi:",pitch,yaw,roll,math.pi)
     
 	# 單位轉換：將弧度轉換為度
     Y = int((pitch/math.pi)*180)
     X = int((yaw/math.pi)*180)
     Z = int((roll/math.pi)*180)
     
-    print('Pitch:{}, yaw:{}, roll:{}'.format(Y,X,Z))
+    #print('Pitch:{}, yaw:{}, roll:{}'.format(Y,X,Z))
     
     return 0, Y, X, Z
 
@@ -352,6 +352,7 @@ def detect(
     iou_thres = 0.5
     imgsz=(640, 640)
     
+    
     # Directories
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
     Path(save_dir).mkdir(parents=True, exist_ok=True)  # make dir
@@ -360,7 +361,12 @@ def detect(
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
     webcam = source.isnumeric() or source.endswith('.txt') or (is_url and not is_file)
     paused=0
-    
+    Pitch=0
+    yaw=0
+    roll=0
+    fps = 0.0
+    tic = time.time()
+    timeo=tic
     # Dataloader
     if webcam:
         print('loading streams:', source)
@@ -488,7 +494,7 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                     #print(xyxy,conf,landmarks,class_num)
                     im0 = show_results(im0, xyxy, conf, landmarks, class_num)
                     image_pts = np.float32([[landmarks[0], landmarks[1]], [landmarks[2], landmarks[3]], [landmarks[4],landmarks[5]], [landmarks[6],landmarks[7]], [landmarks[8],landmarks[9]], [landmarks[10],landmarks[11]]])
-                    print(image_pts)
+                    #print(image_pts)
                     #相機座標
                     _, rotation_vec, translation_vec = cv2.solvePnP(object_pts, image_pts, cam_matrix, dist_coeffs)	
                     #_, rotation_vec, translation_vec = cv2.solvePnP(object_pts, image_pts, cam_matrix, None)	
@@ -526,15 +532,23 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                     #print("-----1-------")
                     #print(translation_vec)
                     #print("-----2-------")
-                    print("rotation_vec:\n",rotation_vec)
+                    #print("rotation_vec:\n",rotation_vec)
                     #print("-----3-------")
                     # 将旋转向量转换为旋转矩阵
                     
                     
-                    get_euler_angle(rotation_vec)  
-                    
+                    _,Pitch,yaw,roll=get_euler_angle(rotation_vec)  
+                    #print('Pitch:{}, yaw:{}, roll:{}'.format(Pitch,yaw,roll))
             
             if view_img:
+                text = "fps:%d,Pitch:%d,yaw:%d,roll:%d"%(fps,Pitch,yaw, roll)
+                cv2.putText(im0, text, (10, 20), cv2.FONT_HERSHEY_PLAIN, 1.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                cv2.putText(im0, text, (10, 20), cv2.FONT_HERSHEY_PLAIN, 1.0,(240, 240, 240), 1, cv2.LINE_AA)		#白字
+                toc = time.time()
+                curr_fps = 1.0 / (toc - tic)
+                # calculate an exponentially decaying average of fps number
+                fps = curr_fps if fps == 0.0 else (fps*0.95 + curr_fps*0.05)
+                tic = toc
                 cv2.imshow('result', im0)
                 key = cv2.waitKey(1)
                 if key == ord(' '):  # 空格鍵
