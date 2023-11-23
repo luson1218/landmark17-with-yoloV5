@@ -98,6 +98,8 @@ mark17xx.pt		  為訓練得到的weights 檔（mark17_18.pt  為第18次遷移�
 
 python detect_m17.py --weights weights/mark17_18.pt --view-
 
+python detect_m17.py --weights weights/mark17_18.pt --source data/pic --img-size 640 --save-img --view-
+
 引文.
 
 CNN:		https://arkalim.org/blog/face-landmarks-detection/
