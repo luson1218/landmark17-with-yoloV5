@@ -432,6 +432,7 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
         #print(len(pred[0]), 'face' if len(pred[0]) == 1 else 'faces')
         
         #執行PythonComputerVision-6-CameraCalibration-master可取得相機內參矩陣
+        #https://github.com/Nocami/PythonComputerVision-6-CameraCalibration/tree/master
         # 相机内参矩阵
         K = [652.33487191, 0.0, 351.48536718,
         0.0, 648.02978378, 198.83791291,
