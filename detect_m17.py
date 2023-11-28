@@ -29,6 +29,12 @@ from utils.general import check_img_size, non_max_suppression_face, apply_classi
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
+def cal_distance(point1, point2):
+    x1, y1 = point1
+    x2, y2 = point2
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return distance
+    
 def get_ro_vector(plane_points,object_pts):
 	# 计算质心
 	
@@ -483,7 +489,8 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                 #det[:, 5:15] = scale_coords_landmarks(img.shape[2:], det[:, 5:15], im0.shape).round()
                 det[:, 5:39] = scale_coords_landmarks(img.shape[2:], det[:, 5:39], im0.shape).round()
                 
-                
+                Lrate=0
+                Rrate=0
                          
 
                 for j in range(det.size()[0]):
@@ -493,8 +500,49 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                     class_num = det[j, 39].cpu().numpy()
                     #print(xyxy,conf,landmarks,class_num)
                     im0 = show_results(im0, xyxy, conf, landmarks, class_num)
+                    
+                    La=(landmarks[12],landmarks[13])
+                    Lb=(landmarks[14],landmarks[15])
+                    Lc=(landmarks[18],landmarks[19])
+                    Ld=(landmarks[20],landmarks[21])
+                    
+                    Ra=(landmarks[24],landmarks[25])
+                    Rb=(landmarks[26],landmarks[27])
+                    Rc=(landmarks[30],landmarks[31])
+                    Rd=(landmarks[32],landmarks[33])
+                    
+                    distance_Lab=cal_distance(La,Lb)
+                    distance_Lcd=cal_distance(Lc,Ld)
+                    distance_Lad=cal_distance(La,Ld)
+                    distance_Lbc=cal_distance(Lb,Lc)
+                    
+                    distance_LW=distance_Lab+distance_Lcd
+                    distance_LH=distance_Lbc+distance_Lad
+                    
+                    
+                    distance_Rab=cal_distance(Ra,Rb)
+                    distance_Rcd=cal_distance(Rc,Rd)
+                    distance_Rad=cal_distance(Ra,Rd)
+                    distance_Rbc=cal_distance(Rb,Rc)
+                    
+
+
+                    distance_RW=distance_Rab+distance_Rcd
+                    distance_RH=distance_Rbc+distance_Rad
+                    
+                    
+                    #print(f"distance_LW:{distance_LW}\n")
+                    #print(f"distance_LH:{distance_LH}\n")
+                    
+                    #print(f"distance_RW:{distance_RW}\n")
+                    #print(f"distance_RH:{distance_RH}\n")
+                    
+                    
+                    
                     image_pts = np.float32([[landmarks[0], landmarks[1]], [landmarks[2], landmarks[3]], [landmarks[4],landmarks[5]], [landmarks[6],landmarks[7]], [landmarks[8],landmarks[9]], [landmarks[10],landmarks[11]]])
                     #print(image_pts)
+                    #print("---------")
+                    
                     #相機座標
                     _, rotation_vec, translation_vec = cv2.solvePnP(object_pts, image_pts, cam_matrix, dist_coeffs)	
                     #_, rotation_vec, translation_vec = cv2.solvePnP(object_pts, image_pts, cam_matrix, None)	
@@ -536,6 +584,11 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                     #print("-----3-------")
                     # 将旋转向量转换为旋转矩阵
                     
+                    Lrate=distance_LH/distance_LW
+                    Rrate=distance_RH/distance_RW
+                    #print(f"Lrate:{Lrate}\n")
+                    #print(f"Rrate:{Rrate}\n")
+                    
                     
                     _,Pitch,yaw,roll=get_euler_angle(rotation_vec)  
                     #print('Pitch:{}, yaw:{}, roll:{}'.format(Pitch,yaw,roll))
@@ -544,6 +597,31 @@ model.stride.max() 是獲取模型中所有層的 stride (步長) 的最大值�
                 text = "fps:%d,Pitch:%d,yaw:%d,roll:%d"%(fps,Pitch,yaw, roll)
                 cv2.putText(im0, text, (10, 20), cv2.FONT_HERSHEY_PLAIN, 1.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
                 cv2.putText(im0, text, (10, 20), cv2.FONT_HERSHEY_PLAIN, 1.0,(240, 240, 240), 1, cv2.LINE_AA)		#白字
+                
+                text2 = "Lrate:%.3f,Rrate:%.3f"%(Lrate,Rrate)
+                cv2.putText(im0, text2, (10, 40), cv2.FONT_HERSHEY_PLAIN, 1.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                cv2.putText(im0, text2, (10, 40), cv2.FONT_HERSHEY_PLAIN, 1.0,(240, 240, 240), 1, cv2.LINE_AA)		#白字
+                
+                if Lrate<0.65 or Rrate<0.65:
+                    text2 = "Sleep"
+                    cv2.putText(im0, text2, (60, 70), cv2.FONT_HERSHEY_PLAIN, 2.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                    cv2.putText(im0, text2, (60, 70), cv2.FONT_HERSHEY_PLAIN, 2.0,(0, 0, 240), 1, cv2.LINE_AA)		#白字
+                else:
+                    text2 = "Wake Up"
+                    cv2.putText(im0, text2, (60, 70), cv2.FONT_HERSHEY_PLAIN, 2.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                    cv2.putText(im0, text2, (60, 70), cv2.FONT_HERSHEY_PLAIN, 2.0,(0, 240, 0), 1, cv2.LINE_AA)		#白字
+                    
+                if Pitch>3 or 0<yaw<165 or 0>yaw>-160:
+                    text2 = "distracted"
+                    cv2.putText(im0, text2, (60, 100), cv2.FONT_HERSHEY_PLAIN, 2.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                    cv2.putText(im0, text2, (60, 100), cv2.FONT_HERSHEY_PLAIN, 2.0,(0, 0, 240), 1, cv2.LINE_AA)		#白字
+                else:
+                    text2 = "concentrate"
+                    cv2.putText(im0, text2, (60, 100), cv2.FONT_HERSHEY_PLAIN, 2.0,(32, 32, 32), 4, cv2.LINE_AA)		#黑底
+                    cv2.putText(im0, text2, (60, 100), cv2.FONT_HERSHEY_PLAIN, 2.0,(0, 240, 0), 1, cv2.LINE_AA)		#白字
+                
+                
+                
                 toc = time.time()
                 curr_fps = 1.0 / (toc - tic)
                 # calculate an exponentially decaying average of fps number
